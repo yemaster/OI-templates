@@ -1,0 +1,72 @@
+/*
+ * Description: 树状数组 区间修改区间查询
+ * Problem:
+ * Author:      yemaster
+ */
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#define lowbit(x) (x) & (-(x))
+#define RI register int
+
+using namespace std;
+
+int n, m;
+long long c1[100005], c2[100005];
+
+inline void update1(int x, int v) {
+	for (RI i = x; i <= n; i += lowbit(i))
+		c1[i] += v;
+}
+
+inline void update2(int x, int v) {
+	for (RI i = x; i <= n; i += lowbit(i))
+		c2[i] += v;
+}
+
+inline int sum1(int l) {
+	int ans = 0;
+	for (RI i = l; i; i -= lowbit(i))
+		ans += c1[i];
+	return ans;
+}
+
+inline int sum2(int l) {
+	int ans = 0;
+	for (RI i = l; i; i -= lowbit(i))
+		ans += c2[i];
+	return ans;
+}
+
+int main() {
+	scanf("%d%d", &n, &m);
+	long long last = 0;
+	for (RI i = 1; i <= n; ++i) {
+		long long x;
+		scanf("%lld", &x);
+		update1(i, x - last); 
+		update2(i, (x - last) * (i - 1)); 
+		last = x;
+	}
+	for (RI i = 1; i <= m; ++i) {
+		long long tp, x, y, k;
+		scanf("%lld%lld%lld", &tp, &x, &y);
+		if (tp == 1) {
+			scanf("%lld", &k);
+			update1(x, k);
+			update1(y + 1, -k);
+			update2(x, (x - 1) * k); 
+			update2(y + 1, -y * k); 
+		}
+		else {
+			long long ans = 0;
+			ans += y * sum1(y);
+			ans -= sum2(y);
+			ans += sum2(x - 1);
+			ans -= (x - 1) * sum1(x - 1);
+			printf("%lld\n", ans);
+		}
+	}
+	return 0;
+}
